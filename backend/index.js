@@ -16,10 +16,11 @@ const sequelize = new Sequelize('crud_II', 'postgres', 'ASKsome123!', {
 const Book = sequelize.define('Book', {
   title: { type: DataTypes.STRING, allowNull: false },
   desc: { type: DataTypes.STRING, allowNull: false },
-  cover: { type: DataTypes.STRING }
+  cover: { type: DataTypes.STRING },
+  price: { type: DataTypes.INTEGER, allowNull: false }
 }, { timestamps: true });
 
-sequelize.sync()
+sequelize.sync({ alter: true })
   .then(() => {
     console.log('Database and table synced');
   })
@@ -38,14 +39,14 @@ app.get('/books', async (req, res) => {
 });
 
 app.post('/books/create', async (req, res) => {
-    const { title, desc, cover } = req.body;
-    try {
-        const newBook = await Book.create({ title, desc, cover })
-        res.json(newBook)
-    } catch (error) {
-        console.error('Error creating a new Book', error)
-        res.status(500).json({error: 'Internal Server Error'})
-    }
+  const { title, desc, cover } = req.body;
+  try {
+    const newBook = await Book.create({ title, desc, cover })
+    res.json(newBook)
+  } catch (error) {
+    console.error('Error creating a new Book', error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
 })
 
 app.listen(8080, () => {

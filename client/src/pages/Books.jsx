@@ -18,15 +18,13 @@ const Books = () => {
   }, []);
 
   const handleDelete = async (id) => {
-  try {
-    await axios.delete(`http://localhost:8080/books/${id}`);
-    // Filter out the deleted book from the local state
-    setBooks((prevBooks) => prevBooks.filter((book) => book.id !== id));
-    window.location.reload();
-  } catch (error) {
-    console.error('Error deleting this Book', error);
-  }
-};
+    try {
+      await axios.delete(`http://localhost:8080/books/${id}`);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting this Book", error);
+    }
+  };
 
   return (
     <>
@@ -38,8 +36,12 @@ const Books = () => {
             <h2>{book.title}</h2>
             <p>{book.desc}</p>
             <span>{book.price}</span>
-            <button className="delete" onClick={() => handleDelete(book.id)}>Delete</button>
-            <button className="update"><Link to={`/update/{book.id}`} >Update</Link></button>
+            <button className="delete" onClick={() => handleDelete(book.id)}>
+              Delete
+            </button>
+            <Link to={`/update/${book.id}`}>
+              <button className="update">Update</button>
+            </Link>
           </div>
         ))}
       </div>

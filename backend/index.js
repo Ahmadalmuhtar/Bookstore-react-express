@@ -67,24 +67,30 @@ app.delete('/books/:id', async (req, res) => {
 });
 
 app.put('/books/:id', async (req, res) => {
-  const id = req.params.id
+  const id = req.params.id;
+  const { title, desc, cover, price } = req.body; // Destructure the request body
+
   try {
     const bookToBeUpdated = await Book.findByPk(id);
-    if(!bookToBeUpdated){
-      return res.status(404).json({message: 'Book was not found'})
+
+    if (!bookToBeUpdated) {
+      return res.status(404).json({ message: 'Book not found' });
     }
+
+    // Update the book attributes only if they are provided in the request body
     await bookToBeUpdated.update({
       title: title || bookToBeUpdated.title,
-      des: desc || bookToBeUpdated.desc,
+      desc: desc || bookToBeUpdated.desc,
       cover: cover || bookToBeUpdated.cover,
       price: price || bookToBeUpdated.price,
     });
-    res.status(200).json({message: 'book was updated successfully'})
+
+    res.status(200).json({ message: 'Book was updated successfully' });
   } catch (error) {
-    console.error('Error updating this book', error)
-    res.status(500).json({error: 'Internal server Error'})
+    console.error('Error updating this book', error);
+    res.status(500).json({ error: 'Internal server Error' });
   }
-})
+});
 
 
 app.listen(8080, () => {

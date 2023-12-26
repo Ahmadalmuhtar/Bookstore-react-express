@@ -69,7 +69,8 @@ const Update = () => {
             value={book.price || ""}
           />
           <input
-            type="text"
+            type="file"
+            accept="image/jpeg"
             placeholder="cover"
             onChange={handleChange}
             name="cover"

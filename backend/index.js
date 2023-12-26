@@ -1,6 +1,8 @@
-import express from 'express'
-import cors from 'cors'
+import express from 'express';
+import cors from 'cors';
 import { Sequelize, DataTypes } from 'sequelize';
+import multer from 'multer';
+import path from 'path';
 
 
 const app = express();
@@ -29,6 +31,19 @@ sequelize.sync({ alter: true })
     console.error('Error syncing Database', err);
   });
 
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + Date.now() + ext);
+  },
+});
+
+const upload = multer({ storage: storage });
+
 app.get('/books', async (req, res) => {
   try {
     const books = await Book.findAll();
@@ -39,16 +54,18 @@ app.get('/books', async (req, res) => {
   }
 });
 
-app.post('/books/create', async (req, res) => {
-  const { title, desc, cover, price } = req.body;
+app.post('/books/create', upload.single('cover'), async (req, res) => {
+  const { title, desc, price } = req.body;
+  const cover = req.file ? req.file.path : null;
+
   try {
-    const newBook = await Book.create({ title, desc, cover, price })
-    res.json(newBook)
+    const newBook = await Book.create({ title, desc, cover, price });
+    res.json(newBook);
   } catch (error) {
-    console.error('Error creating a new Book', error)
-    res.status(500).json({ error: 'Internal Server Error' })
+    console.error('Error creating a new Book', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-})
+});
 
 app.delete('/books/:id', async (req, res) => {
   const id = req.params.id;
@@ -66,9 +83,10 @@ app.delete('/books/:id', async (req, res) => {
   }
 });
 
-app.put('/books/:id', async (req, res) => {
+app.put('/books/:id', upload.single('cover'), async (req, res) => {
   const id = req.params.id;
-  const { title, desc, cover, price } = req.body; // Destructure the request body
+  const { title, desc, price } = req.body;
+  const cover = req.file ? req.file.path : null;
 
   try {
     const bookToBeUpdated = await Book.findByPk(id);
@@ -77,14 +95,12 @@ app.put('/books/:id', async (req, res) => {
       return res.status(404).json({ message: 'Book not found' });
     }
 
-    // Update the book attributes only if they are provided in the request body
     await bookToBeUpdated.update({
       title: title || bookToBeUpdated.title,
       desc: desc || bookToBeUpdated.desc,
       cover: cover || bookToBeUpdated.cover,
       price: price || bookToBeUpdated.price,
     });
-
     res.status(200).json({ message: 'Book was updated successfully' });
   } catch (error) {
     console.error('Error updating this book', error);

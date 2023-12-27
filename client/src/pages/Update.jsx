@@ -27,16 +27,33 @@ const Update = () => {
   }, [id]);
 
   const handleChange = (e) => {
-    setBook((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value, type } = e.target;
+
+    // For file inputs, use FileReader to read the file content
+    if (type === "file") {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setBook((prev) => ({ ...prev, [name]: reader.result }));
+      };
+
+      if (file) {
+        reader.readAsDataURL(file);
+      }
+    } else {
+      // For other inputs, update the state as usual
+      setBook((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.put(`http://localhost:8080/books/${id}`, book);
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      console.error('Error updating the book', error);
+      console.error("Error updating the book", error);
     }
   };
 
@@ -72,7 +89,6 @@ const Update = () => {
             placeholder="cover"
             onChange={handleChange}
             name="cover"
-            value={book.cover || ""}
           />
           <button onClick={handleSubmit}>Update</button>
         </h1>

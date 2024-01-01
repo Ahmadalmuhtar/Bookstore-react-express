@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { ThemeContext } from "../ThemeContext";
 
 const Add = () => {
+  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [book, setBook] = useState({
     title: "",
     desc: "",
@@ -46,7 +48,7 @@ const Add = () => {
   return (
     <div>
       <div className="form">
-        <h1>
+        <h1 style={{ color: isDarkMode ? "black" : "white" }}>
           Add a New Book
           <input
             type="text"
@@ -78,6 +80,9 @@ const Add = () => {
           />
           <button onClick={handleSubmit}>Add Book</button>
         </h1>
+        <button onClick={toggleTheme}>
+          Toggle Theme: {isDarkMode ? "Dark" : "Light"}
+        </button>
       </div>
     </div>
   );

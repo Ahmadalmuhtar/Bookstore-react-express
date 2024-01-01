@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import { ThemeContext } from "../ThemeContext";
 
 const Books = () => {
+  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [books, setBooks] = useState([]);
   const navigate = useNavigate();
 
@@ -34,7 +36,12 @@ const Books = () => {
 
   return (
     <>
-      <h1>Ahmad's Book Shop</h1>
+      <h1 style={{ color: isDarkMode ? "white" : "black" }}>
+        Ahmad's Book Shop
+      </h1>
+      <button onClick={toggleTheme}>
+        Toggle Theme: {isDarkMode ? "Dark" : "Light"}
+      </button>
       <div className="books">
         {books.map((book) => (
           <div className="book" key={book.id}>

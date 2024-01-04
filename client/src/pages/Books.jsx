@@ -1,67 +1,28 @@
-import React, { useEffect, useState, useContext } from "react";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import { ThemeContext } from "../ThemeContext";
+import React from "react";
+import { useTheme } from "../ThemeProvider";
+import { Link } from "react-router-dom";
 
 const Books = () => {
-  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
-  const [books, setBooks] = useState([]);
-  const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    const fetchAllBooks = async () => {
-      try {
-        const res = await axios.get("http://localhost:8080/books");
-        setBooks(res.data);
-      } catch (error) {
-        console.error("Error fetching Data:", error);
-      }
-    };
-    fetchAllBooks();
-  }, []);
-
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:8080/books/${id}`);
-      window.location.reload();
-    } catch (error) {
-      console.error("Error deleting this Book", error);
-    }
+  const containerStyle = {
+    background: theme.background,
+    color: theme.text,
+    padding: "20px",
   };
 
-  const handleUpdate = (id) => {
-    // Navigate to the update page with the book id
-    navigate(`/update/${id}`);
+  const handleToggle = () => {
+    toggleTheme();
   };
 
   return (
-    <>
-      <h1 style={{ color: isDarkMode ? "white" : "black" }}>
-        Ahmad's Book Shop
-      </h1>
-      <button onClick={toggleTheme}>
-        Toggle Theme: {isDarkMode ? "Dark" : "Light"}
-      </button>
-      <div className="books">
-        {books.map((book) => (
-          <div className="book" key={book.id}>
-            {book.cover && <img src={book.cover} alt="" />}
-            <h2>{book.title}</h2>
-            <p>{book.desc}</p>
-            <span>{book.price}</span>
-            <button className="delete" onClick={() => handleDelete(book.id)}>
-              Delete
-            </button>
-            <button className="update" onClick={() => handleUpdate(book.id)}>
-              Update
-            </button>
-          </div>
-        ))}
-      </div>
+    <div style={containerStyle}>
+      <h1>Ahmad's Book Shop</h1>
+      <button onClick={handleToggle}>Toggle Theme</button>
       <Link to="/add">
         <button style={{ cursor: "pointer" }}>Add new book</button>
       </Link>
-    </>
+    </div>
   );
 };
 
